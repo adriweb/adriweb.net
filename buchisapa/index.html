@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <title>Buchisapa translator</title>
+  <meta name="description" content="Buchisapa translator">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon" href="icon.png">
+  <style>
+    html, body {
+      margin: 0;
+      box-sizing: border-box;
+    }
+    #esText, #buText {
+      display: block;
+      font-family: inherit;
+      width: 100%;
+      height: 42%;
+      font-size: xx-large;
+      border: 1px grey solid;
+      padding: 1px 4px;
+    }
+    #buText {
+      font-weight: bold;
+    }
+    #buText > span {
+      font-weight: lighter;
+      color: #555;
+    }
+    #buttons {
+      height: 10%;
+      margin: 5px auto;
+      text-align: center;
+    }
+    #buttons > button {
+      min-height: fit-content;
+      padding: 5px 15px;
+      margin: 5px;
+      font-size: larger;
+    }
+    div[placeholder]:empty::before {
+      content: attr(placeholder);
+      color: #999;
+    }
+    div[placeholder]:empty:focus::before {
+      content: "";
+    }
+  </style>
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+  <div id="esText" contenteditable="true" placeholder="Español"></div>
+  <div id="buText" contenteditable="true" placeholder="Buchisapa"></div>
+  <div id="buttons">
+    <button onclick="speak(document.getElementById('esText').innerText)">🔊Español</button>
+    <button onclick="speak(document.getElementById('buText').innerText)">🔊Buchisapa</button>
+  </div>
+  <script>
+    const resizeHandler = function() {
+      const w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+      const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+      document.querySelectorAll("html,body").forEach((el) => { el.style.width = `${w}px`; el.style.height = `${h}px`; });
+    };
+
+    window.onresize = resizeHandler;
+    resizeHandler();
+
+    const esTextArea = document.getElementById("esText");
+    const buTextArea = document.getElementById("buText");
+
+    esTextArea.onkeyup = esTextArea.onpaste = function() {
+      buTextArea.innerHTML = esTextArea.innerText.replace(/([aáäeéëiíïoóöuúüy])/gi, "$1<span>p$1</span>");
+    }
+    buTextArea.onkeyup = buTextArea.onpaste = function() {
+      esTextArea.innerText = buTextArea.innerText.replace(/([aáäeéëiíïoóöuúüy])p\1/gi, "$1");
+    }
+
+    function speak(text) {
+      if ('speechSynthesis' in window && text && text.length) {
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'es-MX';
+        msg.rate = 0.75;
+        window.speechSynthesis.speak(msg);
+      }
+    }
+
+  </script>
+</body>
+
+</html>
